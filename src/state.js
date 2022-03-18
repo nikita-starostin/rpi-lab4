@@ -29,7 +29,6 @@ export function redrawState(state) {
 }
 
 export function setState(newState, shouldRedraw = true) {
-    console.log(state);
     state = {...state, ...newState};
     if (shouldRedraw) {
         redrawState(state);
