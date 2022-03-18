@@ -1,23 +1,52 @@
-﻿import _ from 'lodash';
-import printMe from './print.js';
-import html from './test.html';
-import styles from './test.scss';
+﻿import html from './index.html';
+import {getState, setState} from "./state";
+import {fetchNews} from "./news-api";
+import styles from "./index.scss";
 
-function component() {
-    const element = document.createElement('div');
-    const element2 = document.createElement('div');
-    const btn = document.createElement('button');
-    console.log(html);
+document.body.innerHTML = html;
 
-    // Lodash, currently included via a script, is required for this line to work
-    element.innerHTML = _.join(['Hello', 'webpack'], ' ');
-    btn.innerHTML = 'Click me and check the console!';
-    element2.innerHTML = html;
-    btn.onclick = printMe;
+document.querySelector('button.load-more')
+    .addEventListener('click', async () => {
+        const state = getState();
+        const news = await fetchNews(state);
+        setState({
+            news: [
+                ...state.news,
+                ...news
+            ]
+        })
+    });
 
-    element.appendChild(btn);
-    element.appendChild(element2)
-    return element;
-}
+document.querySelector('input.input-source')
+    .addEventListener('input', (event) => {
+        const state = getState();
+        setState({
+            filter: {
+                ...state.filter,
+                source: event.target.value
+            }
+        })
+    })
 
-document.body.appendChild(component());
+document.querySelector('input.input-query')
+    .addEventListener('input', (event) => {
+        const state = getState();
+        setState({
+            filter: {
+                ...state.filter,
+                query: event.target.value
+            }
+        })
+    })
+
+document.querySelector('form.filter-form')
+    .addEventListener('submit', async () => {
+        const state = getState();
+        const news = await fetchNews(state);
+        setState({
+            news: [
+                ...state.news,
+                ...news
+            ]
+        })
+    })
